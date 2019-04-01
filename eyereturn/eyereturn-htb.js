@@ -139,18 +139,19 @@ function EyereturnHtb(configs) {
 
 
         // TODO: get user's ip instead of hardcoded
+        // TODO: returnParcel.requestId - is that the correct id to pass?
         var payload = {
-            imp: {
+            imp: [{
                 banner: {
-                    w: parseInt(xSlot.sizes[0][0]),
-                    h: parseInt(xSlot.sizes[0][1])
+                    w: parseInt(xSlot.w),
+                    h: parseInt(xSlot.h)
                 }
-            },
+            }],
             device: {
                 ua: Browser.getUserAgent(),
                 ip: "199.166.10.82"
             },
-            id: xSlot.getId()
+            id: returnParcel.requestId
         };
 
         /* Change this to your bidder endpoint. */
@@ -214,6 +215,8 @@ function EyereturnHtb(configs) {
      * callback type to CallbackTypes.CALLBACK_NAME and omit this function.
      */
     function adResponseCallback(adResponse) {
+        console.log('adResponseCallback: ' + JSON.stringify(adResponse));
+
         /* Get callbackId from adResponse here */
         var callbackId = 0;
         __baseClass._adResponseStore[callbackId] = adResponse;
@@ -235,6 +238,7 @@ function EyereturnHtb(configs) {
      * @param  {string} pixelUrl Tracking pixel img url.
      */
     function __renderPixel(pixelUrl) {
+        console.log('__renderPixel: ' + JSON.stringify(pixelUrl));
         if (pixelUrl) {
             Network.img({
                 url: decodeURIComponent(pixelUrl),
@@ -278,9 +282,9 @@ function EyereturnHtb(configs) {
 
         /* ---------- Process adResponse and extract the bids into the bids array ------------ */
 
-        console.log('adResponse:' + JSON.stringify(adResponse));
+        console.log('__parseResponse:' + JSON.stringify(adResponse));
 
-        var bids = adResponse;
+        var bids = adResponse.seatbid;
 
         /* --------------------------------------------------------------------------------- */
 
@@ -303,12 +307,13 @@ function EyereturnHtb(configs) {
                  */
 
                 /* ----------- Fill this out to find a matching bid for the current parcel ------------- */
-                if (curReturnParcel.xSlotRef.placementId === bids[i].placementId) {
-                    curBid = bids[i];
+                // TODO: commentting out if 
+                //if (curReturnParcel.xSlotRef.placementId === bids[i].placementId) {
+                    curBid = bids[i].bid[0];
                     bids.splice(i, 1);
 
                     break;
-                }
+                // TODO: commentting out if }
             }
 
             /* No matching bid found so its a pass */
@@ -329,13 +334,19 @@ function EyereturnHtb(configs) {
             /* The bid price for the given slot */
             var bidPrice = curBid.price;
 
+            // TODO: current bidder endpoint doesn't return widith and height so add it
+            if (!curBid.width) {
+                curBid.width = 300;
+                curBid.height = 250;
+            }
+
             /* The size of the given slot */
             var bidSize = [Number(curBid.width), Number(curBid.height)];
 
             /* The creative/adm for the given slot that will be rendered if is the winner.
              * Please make sure the URL is decoded and ready to be document.written.
              */
-            var bidCreative = curBid.adm;
+            var bidCreative = "console.log('rendering adm'); document.write('" + curBid.adm + "');";
 
             /* The dealId if applicable for this slot. */
             var bidDealId = curBid.dealid;
