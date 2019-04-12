@@ -43,7 +43,7 @@ function getBidRequestRegex() {
     console.log('getBidRequestRegex');
     return {
         method: 'POST',
-        urlRegex: /http:\/\/bidder-dev.eyereturn.net\/bid_casale_openrtb/
+        urlRegex: /.*bidder-dev.eyereturn.net\/bid_casale_openrtb.*/
     };
 }
 
@@ -52,7 +52,7 @@ function validateBidRequest() {
 }
 
 function getValidResponse(request, creative) {
-    console.log('validateResponse');
+    console.log('getValidResponse, creative:' + JSON.stringify(creative));
     var r = JSON.parse(request.body);
     var adm = creative || '<script type="text/javascript" src="http://p3.eyereturn.com/ed/3/?7249996&cid=314569&tid=7249996&oid=FA2F43C00DD40E23&vid=null&iid=cb70163c-49a6-11e9-a928-eff3f10311ad&p=${AUCTION_PRICE}&bd2=y3AWPUmmEempKO_z8QMRrYqqv8nzDtjsZmEOOw&rnd=-743082806484230412&ex=ChAKC251bV9kZXZpY2VzEgEx"></script>';
     var response = {
@@ -85,8 +85,8 @@ function validateTargeting(targetingMap) {
 }
 
 function getPassResponse(request) {
-    console.log('getPassResponse, request: ' + JSON.stringify(request));
-    return '';
+    console.log('getPassResponse1, request: ' + JSON.stringify(request));
+    return '{}';
 }
 
 module.exports = {
